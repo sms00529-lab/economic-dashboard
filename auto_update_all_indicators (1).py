@@ -50,30 +50,33 @@ def get_nasdaq():
     return None
 
 def get_bitcoin():
-    """비트코인 실시간"""
+    """비트코인 실시간 (업비트 KRW)"""
     try:
+        # 업비트 API (한국 원화 시세)
         response = requests.get(
-            'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true',
+            'https://api.upbit.com/v1/ticker?markets=KRW-BTC',
             timeout=10, verify=False
         )
-        data = response.json()
-        price = data['bitcoin']['usd']
-        change = data['bitcoin']['usd_24h_change']
-        print(f"✅ Bitcoin: ${price:,.0f} ({change:+.2f}%)")
-        return {"value": round(price, 2), "change": round(change, 2)}
+        data = response.json()[0]
+        price = int(data['trade_price'])  # 원화
+        change = data['signed_change_rate'] * 100
+        
+        print(f"✅ Bitcoin: {price:,}원 ({change:+.2f}%)")
+        return {"value": price, "change": round(change, 2)}
     except Exception as e:
         print(f"❌ Bitcoin 에러: {e}")
     return None
 
 def get_gold():
-    """금 실시간 (GLD ETF)"""
+    """금 실시간 (국제 시세 - 온스당 달러)"""
     try:
-        ticker = yf.Ticker("GLD")  # SPDR Gold Shares ETF
+        # 금 선물 가격 (GC=F - Gold Futures)
+        ticker = yf.Ticker("GC=F")
         ticker.session.verify = False
         hist = ticker.history(period="2d")
         if len(hist) >= 2:
-            current = hist['Close'][-1] * 10  # ETF → 금 온스 근사치
-            previous = hist['Close'][-2] * 10
+            current = hist['Close'][-1]
+            previous = hist['Close'][-2]
             change = ((current - previous) / previous) * 100
             print(f"✅ Gold: ${current:.2f} ({change:+.2f}%)")
             return {"value": round(current, 2), "change": round(change, 2)}
@@ -82,16 +85,16 @@ def get_gold():
     return None
 
 def get_oil():
-    """원유 실시간 (USO ETF)"""
+    """원유 실시간 (WTI 선물)"""
     try:
-        ticker = yf.Ticker("USO")  # United States Oil Fund ETF
+        ticker = yf.Ticker("CL=F")  # WTI Crude Oil Futures
         ticker.session.verify = False
         hist = ticker.history(period="2d")
         if len(hist) >= 2:
             current = hist['Close'][-1]
             previous = hist['Close'][-2]
             change = ((current - previous) / previous) * 100
-            print(f"✅ Oil: ${current:.2f} ({change:+.2f}%)")
+            print(f"✅ Oil (WTI): ${current:.2f} ({change:+.2f}%)")
             return {"value": round(current, 2), "change": round(change, 2)}
     except Exception as e:
         print(f"❌ Oil 에러: {e}")

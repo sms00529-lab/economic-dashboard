@@ -329,19 +329,43 @@
         .chart-container {
             height: 80px;
             margin-top: 15px;
+            position: relative;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .chart-large {
             height: 220px;
             margin-top: 20px;
+            position: relative;
+        }
+
+        .chart-large canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
         .footer {
             text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-size: 13px;
-            margin-top: 30px;
+            padding: 30px;
+            color: #2c3e50;
+            font-size: 18px;
+            margin-top: 40px;
+            font-weight: 700;
+            border-top: 2px solid #e8e8e8;
+        }
+
+        .footer strong {
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .footer a {
+            font-size: 18px;
+            font-weight: 700;
         }
 
         .info-text {
@@ -393,8 +417,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main" id="kospi-value">2,436.30</div>
-                        <span class="value-change up" id="kospi-change">+1.04%</span>
+                        <div class="value-main" id="kospi-value">4,060.32</div>
+                        <span class="value-change up" id="kospi-change">+0.79%</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="kospi-chart"></canvas>
@@ -411,8 +435,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main" id="nasdaq-value">23,454.09</div>
-                        <span class="value-change up" id="nasdaq-change">+0.17%</span>
+                        <div class="value-main" id="nasdaq-value">23,505.14</div>
+                        <span class="value-change up" id="nasdaq-change">+0.22%</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="nasdaq-chart"></canvas>
@@ -425,12 +449,13 @@
                         <div class="card-icon icon-bitcoin">₿</div>
                         <div class="card-title">
                             <h3>Bitcoin</h3>
-                            <p>비트코인</p>
+                            <p>비트코인 (KRW)</p>
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main" id="bitcoin-value">$95,420</div>
-                        <span class="value-change up" id="bitcoin-change">+2.15%</span>
+                        <div class="value-main" id="bitcoin-value">138,001,000원</div>
+                        <span class="value-change up" id="bitcoin-change">+0.44%</span>
+                        <div style="font-size: 11px; color: #27ae60; margin-top: 5px; font-weight: 600;">🔥 한국 프리미엄 +1.3%</div>
                     </div>
                     <div class="chart-container">
                         <canvas id="bitcoin-chart"></canvas>
@@ -443,7 +468,7 @@
                         <div class="card-icon icon-gold">🥇</div>
                         <div class="card-title">
                             <h3>Gold</h3>
-                            <p>금 선물</p>
+                            <p>국제 금 시세 (온스)</p>
                         </div>
                     </div>
                     <div class="card-value">
@@ -465,8 +490,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main" id="oil-value">$72.50</div>
-                        <span class="value-change up" id="oil-change">+1.15%</span>
+                        <div class="value-main" id="oil-value">$59.66</div>
+                        <span class="value-change down" id="oil-change">-0.02%</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="oil-chart"></canvas>
@@ -498,6 +523,23 @@
             <div class="info-text">
                 💡 24개월 금리 추세 - 한국은행 vs 미국 연준(FED)
             </div>
+            
+            <!-- 한미 기준금리 18년 비교 차트 (2008~2025) -->
+            <div class="grid-container" style="grid-template-columns: 1fr; margin-bottom: 30px;">
+                <div class="card card-large">
+                    <div class="card-header" style="justify-content: center;">
+                        <div class="card-title" style="text-align: center;">
+                            <h3 style="font-size: 22px; margin-bottom: 8px;">🏦 한미 기준금리 장기 비교</h3>
+                            <p style="font-size: 14px;">2008 금융위기부터 현재까지 - 한국은행 vs 미국 연준</p>
+                        </div>
+                    </div>
+                    <div class="chart-large" style="height: 300px;">
+                        <canvas id="rate-comparison"></canvas>
+                    </div>
+                    <div class="trend-label" style="margin-top: 15px;">2008 ~ 2025 (18년)</div>
+                </div>
+            </div>
+
             <div class="grid-container grid-2col">
                 <div class="card card-large" id="kr-rate-card">
                     
@@ -590,6 +632,23 @@
             <div class="info-text">
                 💡 M2 광의통화량 24개월 추세
             </div>
+            
+            <!-- 한미 M2 비교 차트 (10년 장기) -->
+            <div class="grid-container" style="grid-template-columns: 1fr; margin-bottom: 30px;">
+                <div class="card card-large">
+                    <div class="card-header" style="justify-content: center;">
+                        <div class="card-title" style="text-align: center;">
+                            <h3 style="font-size: 22px; margin-bottom: 8px;">🌏 한미 M2 통화량 10년 비교</h3>
+                            <p style="font-size: 14px;">한국 (조원) vs 미국 (조달러) - 정규화 비교</p>
+                        </div>
+                    </div>
+                    <div class="chart-large" style="height: 300px;">
+                        <canvas id="m2-comparison"></canvas>
+                    </div>
+                    <div class="trend-label" style="margin-top: 15px;">2015 ~ 2024 (10년)</div>
+                </div>
+            </div>
+
             <div class="grid-container grid-2col">
                 <div class="card card-large" id="kr-m2-card">
                     
@@ -719,7 +778,7 @@
 
         <div class="footer">
             💼 <strong>@Chok.sense1</strong> | 부산 부동산 투자 전문 | 
-            <a href="https://github.com" target="_blank" style="color: #3498db; text-decoration: none;">GitHub</a>
+            <a href="https://github.com" target="_blank" style="color: #3498db; text-decoration: none;">투자센스촉센세</a>
         </div>
     </div>
 
@@ -727,12 +786,12 @@
     <script>
         // ⭐ 수동 입력 데이터
         const MANUAL_DATA = {
-            kospi: { value: 4028.51, change: -0.19 },
-            nasdaq: { value: 23454.09, change: 0.17 },
-            bitcoin: { value: 92614, change: -0.45 },
-            gold: { value: 3868.80, change: -0.09 },
-            oil: { value: 70.66, change: 0.66 },
-            exchange: { value: 1471.52, change: 0.28 }
+            kospi: { value: 4060.32, change: 0.79 },
+            nasdaq: { value: 23505.14, change: 0.22 },
+            bitcoin: { value: 138001000, change: 0.44 },
+            gold: { value: 2645.80, change: -0.35 },
+            oil: { value: 59.66, change: -0.02 },
+            exchange: { value: 1398.50, change: 0.25 }
         };
 
         // 경제지표 변동 데이터 (0이면 변동 없음, 값이 있으면 변동 발생)
@@ -757,6 +816,10 @@
             us_rate: [4.25, 4.25, 4.50, 4.75, 5.00, 5.00, 5.00, 5.25, 5.25, 5.25, 5.25, 5.25,
                       5.25, 5.25, 5.25, 5.25, 5.25, 4.75, 4.75, 4.75, 4.50, 4.50, 4.50, 4.50],
             
+            // 기준금리 18년 추세 (2008~2025, 연말 기준)
+            kr_rate_long: [3.00, 2.00, 2.50, 3.25, 2.75, 2.50, 2.00, 1.50, 1.25, 1.50, 1.75, 0.50, 0.50, 1.25, 3.50, 3.50, 3.25, 3.00, 3.00],
+            us_rate_long: [0.25, 0.25, 0.25, 0.25, 0.50, 1.50, 2.50, 1.75, 0.25, 0.25, 0.25, 4.50, 5.50, 5.50, 4.50, 4.25, 4.00, 4.00],
+            
             // 국채 추세 (24개월)
             kr_bond: [3.45, 3.52, 3.38, 3.42, 3.55, 3.48, 3.35, 3.40, 3.50, 3.45, 3.38, 3.42,
                       3.48, 3.35, 3.28, 3.32, 3.25, 3.20, 3.18, 3.22, 3.15, 3.18, 3.15, 3.15],
@@ -768,6 +831,10 @@
                     3682, 3705, 3728, 3752, 3775, 3798, 3812, 3825, 3838, 3850, 3850, 3850],
             us_m2: [21.8, 21.7, 21.6, 21.5, 21.4, 21.3, 21.2, 21.1, 21.0, 20.9, 20.9, 20.9,
                     21.0, 21.0, 21.1, 21.1, 21.2, 21.2, 21.2, 21.2, 21.2, 21.2, 21.2, 21.2],
+            
+            // M2 통화량 10년 추세 (연간, 조 단위)
+            kr_m2_10y: [1850, 2050, 2250, 2450, 2680, 2850, 3020, 3180, 3350, 3500, 3650, 3850],
+            us_m2_10y: [10.5, 11.2, 12.0, 13.5, 15.8, 18.2, 19.8, 20.5, 20.8, 21.0, 21.2, 21.2],
             
             // GDP 성장률 (8분기)
             kr_gdp: [2.5, 2.8, 2.3, 2.6, 2.8, 2.5, 2.2, 2.0],
@@ -787,6 +854,12 @@
             const month = i <= 12 ? i : i - 12;
             monthLabels.push(`${year}.${month.toString().padStart(2, '0')}`);
         }
+
+        // 10년 연간 라벨 (2015~2024)
+        const yearLabels = ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024.06', '2024.12', '최근'];
+
+        // 18년 연간 라벨 (2008~2025, 금융위기부터)
+        const longYearLabels = ['2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025.06', '2025'];
 
         const quarterLabels = ['23Q1', '23Q2', '23Q3', '23Q4', '24Q1', '24Q2', '24Q3', '24Q4'];
 
@@ -947,13 +1020,225 @@
             }
         }
 
-        // 비트코인 (API 시도, 실패 시 수동 데이터 사용)
+        // 기준금리 18년 비교 차트 (2008~2025 금융위기부터)
+        function createRateComparisonChart() {
+            const ctx = document.getElementById('rate-comparison');
+            if (!ctx) return;
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: longYearLabels,
+                    datasets: [
+                        {
+                            label: '한국 기준금리',
+                            data: TREND_DATA.kr_rate_long,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 4,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#3498db',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: '미국 기준금리',
+                            data: TREND_DATA.us_rate_long,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 4,
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#e74c3c',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: { size: 14, weight: 'bold' },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
+                                },
+                                footer: function(tooltipItems) {
+                                    const index = tooltipItems[0].dataIndex;
+                                    const krRate = TREND_DATA.kr_rate_long[index];
+                                    const usRate = TREND_DATA.us_rate_long[index];
+                                    const gap = Math.abs(krRate - usRate);
+                                    const higher = krRate > usRate ? '한국' : '미국';
+                                    return `\n금리 격차: ${gap.toFixed(2)}%p (${higher}↑)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 10, weight: 'bold' },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: { color: '#f0f0f0' },
+                            min: 0,
+                            max: 6,
+                            ticks: {
+                                font: { size: 11 },
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return value.toFixed(1) + '%';
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '기준금리 (%)',
+                                font: { size: 13, weight: 'bold' },
+                                color: '#2c3e50'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('✅ 기준금리 18년 비교 차트 생성 완료');
+        }
+
+        // M2 비교 차트 (10년 장기 추세 - 정규화)
+        function createM2ComparisonChart() {
+            const ctx = document.getElementById('m2-comparison');
+            if (!ctx) return;
+            
+            // 데이터 정규화 (첫 값을 100으로 - 2015년 기준)
+            const normalizeData = (data) => {
+                const baseValue = data[0];
+                return data.map(v => (v / baseValue) * 100);
+            };
+            
+            const krNormalized = normalizeData(TREND_DATA.kr_m2_10y);
+            const usNormalized = normalizeData(TREND_DATA.us_m2_10y);
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: yearLabels,
+                    datasets: [
+                        {
+                            label: '한국 M2',
+                            data: krNormalized,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 4,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#3498db',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: '미국 M2',
+                            data: usNormalized,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 4,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#e74c3c',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: { size: 14, weight: 'bold' },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1);
+                                },
+                                footer: function(tooltipItems) {
+                                    const index = tooltipItems[0].dataIndex;
+                                    const krActual = TREND_DATA.kr_m2_10y[index];
+                                    const usActual = TREND_DATA.us_m2_10y[index];
+                                    return `실제값\n한국: ${krActual}조원\n미국: $${usActual}조`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 11, weight: 'bold' },
+                                maxRotation: 0,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: { color: '#f0f0f0' },
+                            ticks: {
+                                font: { size: 11 },
+                                callback: function(value) {
+                                    return value.toFixed(0);
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '2015년 = 100 기준',
+                                font: { size: 13, weight: 'bold' },
+                                color: '#2c3e50'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log('✅ M2 10년 비교 차트 생성 완료');
+        }
+
+        // 비트코인 (업비트 원화 기준)
         async function fetchBitcoin() {
             // 먼저 수동 데이터로 초기화
             const price = MANUAL_DATA.bitcoin.value;
             const change = MANUAL_DATA.bitcoin.change;
             
-            document.getElementById('bitcoin-value').textContent = `$${price.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+            document.getElementById('bitcoin-value').textContent = `${price.toLocaleString('ko-KR')}원`;
             document.getElementById('bitcoin-change').textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
             document.getElementById('bitcoin-change').className = `value-change ${change > 0 ? 'up' : 'down'}`;
             updateCardBorder('bitcoin-card', change);
@@ -969,15 +1254,15 @@
             
             console.log('✅ Bitcoin 초기화 (수동 데이터):', price);
             
-            // API 시도 (백그라운드)
+            // 업비트 API 시도 (백그라운드)
             try {
-                const response = await fetch('https://corsproxy.io/?https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
+                const response = await fetch('https://api.upbit.com/v1/ticker?markets=KRW-BTC');
                 const data = await response.json();
-                const apiPrice = data.bitcoin.usd;
-                const apiChange = data.bitcoin.usd_24h_change;
+                const apiPrice = data[0].trade_price;
+                const apiChange = data[0].signed_change_rate * 100;
                 
                 // API 성공 시 업데이트
-                document.getElementById('bitcoin-value').textContent = `$${apiPrice.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                document.getElementById('bitcoin-value').textContent = `${Math.round(apiPrice).toLocaleString('ko-KR')}원`;
                 document.getElementById('bitcoin-change').textContent = `${apiChange >= 0 ? '+' : ''}${apiChange.toFixed(2)}%`;
                 document.getElementById('bitcoin-change').className = `value-change ${apiChange > 0 ? 'up' : 'down'}`;
                 updateCardBorder('bitcoin-card', apiChange);
@@ -987,7 +1272,7 @@
                     canvas.chart = createMiniChart('bitcoin-chart', apiPrice, apiChange > 0 ? '#e74c3c' : '#3498db');
                 }
                 
-                console.log('🔄 Bitcoin API 업데이트:', apiPrice);
+                console.log('🔄 Bitcoin 업비트 실시간:', apiPrice);
             } catch (error) {
                 console.log('ℹ️ Bitcoin API 실패 (수동 데이터 사용)');
             }
@@ -1218,6 +1503,9 @@
             createTrendChart('kr-rate-trend', monthLabels, TREND_DATA.kr_rate, '#3498db', '한국 기준금리');
             createTrendChart('us-rate-trend', monthLabels, TREND_DATA.us_rate, '#e74c3c', '미국 기준금리');
             
+            // 기준금리 비교 차트 생성
+            createRateComparisonChart();
+            
             // 국채 추세 차트 (장기)
             createTrendChart('kr-bond-trend', monthLabels, TREND_DATA.kr_bond, '#3498db', '한국 국고채 10년');
             createTrendChart('us-bond-trend', monthLabels, TREND_DATA.us_bond, '#e74c3c', '미국 국채 10년');
@@ -1225,6 +1513,9 @@
             // M2 통화량 추세 차트 (장기)
             createTrendChart('kr-m2-trend', monthLabels, TREND_DATA.kr_m2, '#3498db', '한국 M2', '조원');
             createTrendChart('us-m2-trend', monthLabels, TREND_DATA.us_m2, '#e74c3c', '미국 M2', '조달러');
+            
+            // M2 비교 차트 (정규화) - 새로 추가
+            createM2ComparisonChart();
             
             // GDP 추세 차트 (장기)
             createTrendChart('kr-gdp-trend', quarterLabels, TREND_DATA.kr_gdp, '#3498db', '한국 GDP');

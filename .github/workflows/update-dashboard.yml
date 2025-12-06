@@ -37,39 +37,44 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
       
-      # 4-1. 실시간 지수 업데이트 (5분마다)
+      # 4. 진단 (문제 파악용)
+      - name: 시스템 진단
+        run: |
+          echo "🔍 진단 시작..."
+          python test_diagnostic.py || echo "진단 스크립트 실행 실패"
+      
+      # 5-1. 실시간 지수 업데이트
       - name: 실시간 지수 업데이트
         run: |
           echo "🚀 실시간 지수 업데이트 시작..."
-          python auto_update_all_indicators.py || echo "⚠️  일부 실패했지만 계속 진행"
+          python auto_update_all_indicators.py
           echo "✅ 실시간 지수 업데이트 완료"
-        continue-on-error: true
       
-      # 4-2. 공식 지표 업데이트 (하루 1회 또는 수동/Push)
+      # 5-2. 공식 지표 업데이트 (하루 1회 또는 수동/Push)
       - name: 공식 지표 업데이트
         if: github.event.schedule == '0 0 * * *' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         run: |
           echo "🏛️  공식 지표 업데이트 시작..."
-          python auto_update_official_data.py || echo "⚠️  일부 실패했지만 계속 진행"
+          python auto_update_official_data.py
           echo "✅ 공식 지표 업데이트 완료"
         env:
           BOK_API_KEY: ${{ secrets.BOK_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        continue-on-error: true
       
-      # 5. 변경사항 확인 및 커밋
+      # 6. 변경사항 확인
       - name: 변경사항 확인
         id: check_changes
         run: |
           if [[ -n $(git status -s) ]]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "✅ 변경사항이 있습니다"
+            git status -s
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
             echo "ℹ️  변경사항이 없습니다"
           fi
       
-      # 6. 커밋 및 푸시 (변경사항이 있을 때만)
+      # 7. 커밋 및 푸시 (변경사항이 있을 때만)
       - name: 변경사항 커밋 및 푸시
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
@@ -81,7 +86,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-      # 7. 완료 메시지
+      # 8. 완료 메시지
       - name: 완료
         run: |
           echo "========================================"

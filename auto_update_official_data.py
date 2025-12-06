@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-공식 API 데이터 업데이트 스크립트
-- 한국은행 ECOS API
-- FRED API
-- 금리, 국채만 업데이트 (M2, GDP, CPI는 월/분기 데이터라 제외)
+공식 API 데이터 업데이트 스크립트 - 진짜 자동화
+기본값 없음 - API 실패 시 에러 발생
 """
 
 import requests
 import re
 import os
+import sys
 from datetime import datetime, timedelta
+
+try:
+    import yfinance as yf
+except ImportError:
+    print("⚠️  yfinance 패키지가 없습니다. pip install yfinance")
+    yf = None
 
 # API 키 (환경변수 우선, 없으면 기본값)
 BOK_API_KEY = os.getenv("BOK_API_KEY", "MXHS18NIT5XT11X6KRU6")
@@ -38,7 +43,7 @@ def get_bok_data(stat_code, item_code, cycle='D', count=1):
         return None
 
 def get_korea_base_rate():
-    """한국 기준금리"""
+    """한국 기준금리 - 실패 시 예외 발생"""
     # 최근 3개월 데이터 확인
     for days_ago in [0, 30, 60, 90]:
         date = (datetime.now() - timedelta(days=days_ago)).strftime('%Y%m')
@@ -54,17 +59,15 @@ def get_korea_base_rate():
         except:
             continue
     
-    print("⚠️  한국 기준금리: 기본값 사용")
-    return 3.25  # 기본값
+    raise Exception("한국 기준금리 데이터를 가져올 수 없습니다")
 
 def get_korea_bond_10y():
-    """한국 국채 10년물"""
+    """한국 국채 10년물 - 실패 시 예외 발생"""
     value = get_bok_data('817Y002', '010200000', cycle='D')
     if value:
         print(f"✅ 한국 국채 10년: {value}%")
         return value
-    print("⚠️  한국 국채: 기본값 사용")
-    return 3.15  # 기본값
+    raise Exception("한국 국채 데이터를 가져올 수 없습니다")
 
 # ============================================================================
 # FRED API
@@ -96,29 +99,41 @@ def get_fred_data(series_id):
         return None
 
 def get_us_base_rate():
-    """미국 기준금리"""
+    """미국 기준금리 - 실패 시 예외 발생"""
     value = get_fred_data('DFF')
     if value:
         print(f"✅ 미국 기준금리: {value}%")
         return value
-    print("⚠️  미국 기준금리: 기본값 사용")
-    return 4.50  # 기본값
+    raise Exception("미국 기준금리 데이터를 가져올 수 없습니다")
 
 def get_us_bond_10y():
-    """미국 국채 10년물"""
+    """미국 국채 10년물 (yfinance 우선) - 실패 시 예외 발생"""
+    # yfinance 우선 시도
+    if yf:
+        try:
+            ticker = yf.Ticker("^TNX")
+            hist = ticker.history(period="2d")
+            if len(hist) >= 1:
+                current = hist['Close'][-1]
+                print(f"✅ 미국 국채 10년: {current:.2f}%")
+                return round(current, 2)
+        except Exception as e:
+            print(f"⚠️  yfinance 실패, FRED 시도 중... ({e})")
+    
+    # FRED API 시도
     value = get_fred_data('DGS10')
     if value:
-        print(f"✅ 미국 국채 10년: {value}%")
+        print(f"✅ 미국 국채 10년 (FRED): {value}%")
         return value
-    print("⚠️  미국 국채: 기본값 사용")
-    return 4.25  # 기본값
+    
+    raise Exception("미국 국채 데이터를 가져올 수 없습니다")
 
 # ============================================================================
 # HTML 업데이트
 # ============================================================================
 
 def update_html(html_path='index.html'):
-    """HTML 파일의 금리/국채 값만 업데이트"""
+    """HTML 파일의 금리/국채 값만 업데이트 - 실패 시 예외 발생"""
     
     print("\n" + "="*60)
     print("📊 공식 API 데이터 수집 시작")
@@ -131,61 +146,52 @@ def update_html(html_path='index.html'):
     us_bond = get_us_bond_10y()
     
     # HTML 파일 읽기
-    try:
-        if not os.path.exists(html_path):
-            print(f"❌ HTML 파일을 찾을 수 없습니다: {html_path}")
-            return False
-            
-        with open(html_path, 'r', encoding='utf-8') as f:
-            html = f.read()
-    except Exception as e:
-        print(f"❌ HTML 파일 읽기 실패: {e}")
-        return False
+    if not os.path.exists(html_path):
+        raise FileNotFoundError(f"HTML 파일을 찾을 수 없습니다: {html_path}")
+        
+    with open(html_path, 'r', encoding='utf-8') as f:
+        html = f.read()
     
     # 값 업데이트
-    try:
-        # 한국 기준금리
-        kr_rate_pattern = r'(<div class="card card-large" id="kr-rate-card">.*?<div class="value-main">)[\d.]+(%</div>)'
-        html = re.sub(kr_rate_pattern, rf'\g<1>{kr_rate:.2f}\g<2>', html, flags=re.DOTALL)
-        
-        # 미국 기준금리
-        us_rate_pattern = r'(<div class="card card-large" id="us-rate-card">.*?<div class="value-main">)[\d.]+(%</div>)'
-        html = re.sub(us_rate_pattern, rf'\g<1>{us_rate:.2f}\g<2>', html, flags=re.DOTALL)
-        
-        # 한국 국채
-        kr_bond_pattern = r'(<div class="card card-large" id="kr-bond-card">.*?<div class="value-main">)[\d.]+(%</div>)'
-        html = re.sub(kr_bond_pattern, rf'\g<1>{kr_bond:.2f}\g<2>', html, flags=re.DOTALL)
-        
-        # 미국 국채
-        us_bond_pattern = r'(<div class="card card-large" id="us-bond-card">.*?<div class="value-main">)[\d.]+(%</div>)'
-        html = re.sub(us_bond_pattern, rf'\g<1>{us_bond:.2f}\g<2>', html, flags=re.DOTALL)
-        
-        # HTML 파일 저장
-        with open(html_path, 'w', encoding='utf-8') as f:
-            f.write(html)
-        
-        print(f"\n✅ index.html 업데이트 완료!")
-        print(f"⏰ 업데이트 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("="*60 + "\n")
-        return True
-        
-    except Exception as e:
-        print(f"❌ HTML 업데이트 실패: {e}")
-        return False
+    # 한국 기준금리
+    kr_rate_pattern = r'(<div class="card card-large" id="kr-rate-card">.*?<div class="value-main">)[\d.]+(%</div>)'
+    html = re.sub(kr_rate_pattern, rf'\g<1>{kr_rate:.2f}\g<2>', html, flags=re.DOTALL)
+    
+    # 미국 기준금리
+    us_rate_pattern = r'(<div class="card card-large" id="us-rate-card">.*?<div class="value-main">)[\d.]+(%</div>)'
+    html = re.sub(us_rate_pattern, rf'\g<1>{us_rate:.2f}\g<2>', html, flags=re.DOTALL)
+    
+    # 한국 국채
+    kr_bond_pattern = r'(<div class="card card-large" id="kr-bond-card">.*?<div class="value-main">)[\d.]+(%</div>)'
+    html = re.sub(kr_bond_pattern, rf'\g<1>{kr_bond:.2f}\g<2>', html, flags=re.DOTALL)
+    
+    # 미국 국채
+    us_bond_pattern = r'(<div class="card card-large" id="us-bond-card">.*?<div class="value-main">)[\d.]+(%</div>)'
+    html = re.sub(us_bond_pattern, rf'\g<1>{us_bond:.2f}\g<2>', html, flags=re.DOTALL)
+    
+    # HTML 파일 저장
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(html)
+    
+    print(f"\n✅ index.html 업데이트 완료!")
+    print(f"⏰ 업데이트 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*60 + "\n")
 
 # ============================================================================
 # 실행
 # ============================================================================
 
 def main():
-    """메인 함수"""
+    """메인 함수 - 실패 시 exit code 1"""
     try:
-        success = update_html()
-        return 0 if success else 0  # 실패해도 0 반환 (계속 진행)
+        update_html()
+        return 0  # 성공
     except Exception as e:
-        print(f"❌ 예상치 못한 오류: {e}")
-        return 0  # 에러를 무시하고 계속 진행
+        print(f"\n❌ 오류 발생: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1  # 실패
 
 if __name__ == "__main__":
     exit_code = main()
-    exit(exit_code)
+    sys.exit(exit_code)

@@ -2,10 +2,10 @@ name: 대시보드 자동 업데이트
 
 on:
   schedule:
-    # 실시간 지수: 5분마다 (장중 시간대만)
-    - cron: '*/5 0-8 * * 1-5'  # UTC 00:00-08:00 = 한국 09:00-17:00 (평일)
-    # 공식 지표: 하루 1회 (오전 9시)
-    - cron: '0 0 * * *'  # UTC 00:00 = 한국 09:00
+    # 실시간 지수: 5분마다 (장중 시간대)
+    - cron: '*/5 0-8 * * 1-5'  # 한국시간 09:00-17:00 (평일)
+    # 공식 지표: 하루 1회
+    - cron: '0 0 * * *'  # 한국시간 09:00
   
   # 수동 실행 가능
   workflow_dispatch:
@@ -22,8 +22,6 @@ jobs:
       # 1. 코드 체크아웃
       - name: 체크아웃
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
       
       # 2. Python 설정
       - name: Python 설정
@@ -34,62 +32,28 @@ jobs:
       # 3. 패키지 설치
       - name: 패키지 설치
         run: |
-          pip install --upgrade pip
           pip install -r requirements.txt
       
-      # 4. 진단 (문제 파악용)
-      - name: 시스템 진단
+      # 4-1. 실시간 지수 업데이트 (5분마다)
+      - name: 실시간 지수 업데이트 (KOSPI, NASDAQ, Bitcoin...)
         run: |
-          echo "🔍 진단 시작..."
-          python test_diagnostic.py || echo "진단 스크립트 실행 실패"
-      
-      # 5-1. 실시간 지수 업데이트
-      - name: 실시간 지수 업데이트
-        run: |
-          echo "🚀 실시간 지수 업데이트 시작..."
           python auto_update_all_indicators.py
           echo "✅ 실시간 지수 업데이트 완료"
       
-      # 5-2. 공식 지표 업데이트 (하루 1회 또는 수동/Push)
-      - name: 공식 지표 업데이트
-        if: github.event.schedule == '0 0 * * *' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
-        run: |
-          echo "🏛️  공식 지표 업데이트 시작..."
-          python auto_update_official_data.py
-          echo "✅ 공식 지표 업데이트 완료"
-        env:
-          BOK_API_KEY: ${{ secrets.BOK_API_KEY }}
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      # 4-2. 공식 지표 업데이트 (임시 비활성화 - 수동 관리)
+      # - name: 공식 지표 업데이트 (금리, 국채, M2, GDP, CPI)
+      #   if: github.event.schedule == '0 0 * * *' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+      #   run: |
+      #     python auto_update_official_data.py
+      #     echo "✅ 공식 지표 업데이트 완료"
       
-      # 6. 변경사항 확인
-      - name: 변경사항 확인
-        id: check_changes
-        run: |
-          if [[ -n $(git status -s) ]]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "✅ 변경사항이 있습니다"
-            git status -s
-          else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "ℹ️  변경사항이 없습니다"
-          fi
-      
-      # 7. 커밋 및 푸시 (변경사항이 있을 때만)
+      # 5. 변경사항 커밋
       - name: 변경사항 커밋 및 푸시
-        if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add index.html
-          git commit -m "🔄 자동 업데이트: $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M:%S KST')"
+          git diff --staged --quiet || git commit -m "🔄 자동 업데이트: $(date +'%Y-%m-%d %H:%M:%S')"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
-      # 8. 완료 메시지
-      - name: 완료
-        run: |
-          echo "========================================"
-          echo "✅ 모든 작업이 완료되었습니다!"
-          echo "⏰ 완료 시간: $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M:%S KST')"
-          echo "========================================"

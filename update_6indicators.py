@@ -63,18 +63,31 @@ def get_bitcoin():
     return None
 
 def get_gold():
-    """Gold (국제금)"""
+    """Gold (국제금 현물 - XAU/USD)"""
     try:
-        ticker = yf.Ticker("GC=F")
+        # 금 현물 가격 (온스당 달러)
+        ticker = yf.Ticker("XAUUSD=X")
         hist = ticker.history(period="2d")
         if len(hist) >= 2:
             current = hist['Close'][-1]
             previous = hist['Close'][-2]
             change = ((current - previous) / previous) * 100
-            print(f"✅ Gold: ${current:.2f} ({change:+.2f}%)")
+            print(f"✅ Gold (국제금): ${current:.2f} ({change:+.2f}%)")
             return {"value": round(current, 2), "change": round(change, 2)}
     except Exception as e:
         print(f"❌ Gold 에러: {e}")
+        # 백업: GC=F (선물) 시도
+        try:
+            ticker = yf.Ticker("GC=F")
+            hist = ticker.history(period="2d")
+            if len(hist) >= 2:
+                current = hist['Close'][-1]
+                previous = hist['Close'][-2]
+                change = ((current - previous) / previous) * 100
+                print(f"✅ Gold (선물): ${current:.2f} ({change:+.2f}%)")
+                return {"value": round(current, 2), "change": round(change, 2)}
+        except:
+            pass
     return None
 
 def get_oil():

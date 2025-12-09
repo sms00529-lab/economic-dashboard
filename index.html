@@ -472,8 +472,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main" id="gold-value">$2,645</div>
-                        <span class="value-change down" id="gold-change">-0.35%</span>
+                        <div class="value-main" id="gold-value">$4,194</div>
+                        <span class="value-change up" id="gold-change">+58%</span>
                     </div>
                     <div class="chart-container">
                         <canvas id="gold-chart"></canvas>
@@ -551,8 +551,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main">3.25%</div>
-                        <span class="value-change down">-0.25%p</span>
+                        <div class="value-main">2.50%</div>
+                        <span class="value-change down">-0.75%p</span>
                     </div>
                     <div class="chart-large">
                         <canvas id="kr-rate-trend"></canvas>
@@ -570,8 +570,8 @@
                         </div>
                     </div>
                     <div class="card-value">
-                        <div class="value-main">4.50%</div>
-                        <span class="value-change neutral">동결</span>
+                        <div class="value-main">4.00%</div>
+                        <span class="value-change down">-0.50%p</span>
                     </div>
                     <div class="chart-large">
                         <canvas id="us-rate-trend"></canvas>
@@ -786,26 +786,26 @@
     <script>
         // ⭐ 수동 입력 데이터
         const MANUAL_DATA = {
-        kospi: { value: 4143.55, change: -0.27 },
-        nasdaq: { value: 23545.9, change: -0.14 },
-        bitcoin: { value: 134336000, change: -0.48 },
-        gold: { value: 4199.37, change: 0.21 },
-        oil: { value: 58.74, change: -0.24 },
-        exchange: { value: 1468.87, change: -0.2 }
-    };
+            kospi: { value: 4060.32, change: 0.79 },
+            nasdaq: { value: 23505.14, change: 0.22 },
+            bitcoin: { value: 138001000, change: 0.44 },
+            gold: { value: 4193.68, change: 58.5 },
+            oil: { value: 59.66, change: -0.02 },
+            exchange: { value: 1398.50, change: 0.25 }
+        };
 
         // 경제지표 변동 데이터 (0이면 변동 없음, 값이 있으면 변동 발생)
         const INDICATOR_CHANGES = {
-            kr_rate: -0.25,      // 한국 기준금리
-            us_rate: 0,      // 미국 기준금리
-            kr_bond: -0.08,      // 한국 국채
-            us_bond: 0.03,      // 미국 국채
-            kr_m2: 5.2,          // 한국 M2
-            us_m2: -0.3,          // 미국 M2
-            kr_gdp: -0.5,        // 한국 GDP
-            us_gdp: 0.3,        // 미국 GDP
-            kr_cpi: -0.4,        // 한국 CPI
-            us_cpi: -0.2         // 미국 CPI
+            kr_rate: -0.25,      // 한국 기준금리 -0.25%p (인하)
+            us_rate: 0,          // 미국 기준금리 동결
+            kr_bond: -0.08,      // 한국 국채 -0.08%p
+            us_bond: 0.12,       // 미국 국채 +0.12%p
+            kr_m2: 5.2,          // 한국 M2 +5.2% (전년비)
+            us_m2: -0.3,         // 미국 M2 -0.3% (전년비)
+            kr_gdp: -0.5,        // 한국 GDP -0.5%p
+            us_gdp: 0.3,         // 미국 GDP +0.3%p
+            kr_cpi: -0.4,        // 한국 CPI -0.4%p
+            us_cpi: -0.2         // 미국 CPI -0.2%p
         };
 
         // 24개월 추세 데이터 (실제로는 한국은행/연준 데이터 사용)
@@ -817,7 +817,7 @@
                       5.25, 5.25, 5.25, 5.25, 5.25, 4.75, 4.75, 4.75, 4.50, 4.50, 4.50, 4.50],
             
             // 기준금리 18년 추세 (2008~2025, 연말 기준)
-            kr_rate_long: [3.00, 2.00, 2.50, 3.25, 2.75, 2.50, 2.00, 1.50, 1.25, 1.50, 1.75, 0.50, 0.50, 1.25, 3.50, 3.50, 3.25, 3.00, 3.00],
+            kr_rate_long: [3.00, 2.00, 2.50, 3.25, 2.75, 2.50, 2.00, 1.50, 1.25, 1.50, 1.75, 0.50, 0.50, 1.25, 3.50, 3.50, 3.25, 2.75, 2.50],
             us_rate_long: [0.25, 0.25, 0.25, 0.25, 0.50, 1.50, 2.50, 1.75, 0.25, 0.25, 0.25, 4.50, 5.50, 5.50, 4.50, 4.25, 4.00, 4.00],
             
             // 국채 추세 (24개월)
@@ -1327,6 +1327,32 @@
             }
         }
 
+        // Gold 업데이트
+        function updateGold() {
+            const value = MANUAL_DATA.gold.value;
+            const change = MANUAL_DATA.gold.change;
+            
+            document.getElementById('gold-value').textContent = `$${value.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('gold-change').textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+            document.getElementById('gold-change').className = `value-change ${change > 0 ? 'up' : 'down'}`;
+            updateCardBorder('gold-card', change);
+            
+            console.log('✅ Gold 업데이트:', value);
+        }
+        
+        // Oil 업데이트
+        function updateOil() {
+            const value = MANUAL_DATA.oil.value;
+            const change = MANUAL_DATA.oil.change;
+            
+            document.getElementById('oil-value').textContent = `$${value.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('oil-change').textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+            document.getElementById('oil-change').className = `value-change ${change > 0 ? 'up' : 'down'}`;
+            updateCardBorder('oil-card', change);
+            
+            console.log('✅ Oil 업데이트:', value);
+        }
+
         // 카드 테두리 동적 업데이트
         function updateCardBorder(cardId, changePercent) {
             const card = document.getElementById(cardId);
@@ -1476,10 +1502,12 @@
                 goldCanvas.chart = createMiniChart('gold-chart', MANUAL_DATA.gold.value, MANUAL_DATA.gold.change > 0 ? '#e74c3c' : '#3498db');
                 console.log('✅ Gold 차트 생성');
             }
+            updateGold();  // Gold 값 업데이트
             if (oilCanvas) {
                 oilCanvas.chart = createMiniChart('oil-chart', MANUAL_DATA.oil.value, MANUAL_DATA.oil.change > 0 ? '#e74c3c' : '#3498db');
                 console.log('✅ Oil 차트 생성');
             }
+            updateOil();  // Oil 값 업데이트
             
             // 실시간 데이터 로드 - 약간의 딜레이
             console.log('⏳ 실시간 데이터 로딩 시작...');

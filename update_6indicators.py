@@ -86,7 +86,9 @@ def get_gold():
             change_elem = soup.select_one('[data-test="instrument-price-change-percent"]')
             change = 0.0
             if change_elem:
-                change_text = change_elem.text.strip().replace('%', '').replace('+', '')
+                change_text = change_elem.text.strip()
+                # 괄호, %, + 제거
+                change_text = change_text.replace('(', '').replace(')', '').replace('%', '').replace('+', '').strip()
                 change = float(change_text)
             
             print(f"✅ Gold (Investing.com): ${price:,.2f} ({change:+.2f}%)")

@@ -63,39 +63,42 @@ def get_bitcoin():
     return None
 
 def get_gold():
-    """Gold (국제금 현물 - XAU/USD)"""
+    """Gold (Investing.com 국제금)"""
     try:
-        # 금 현물 가격 (온스당 달러)
-        ticker = yf.Ticker("XAUUSD=X")
-        hist = ticker.history(period="2d")
-        if len(hist) >= 2:
-            current = hist['Close'][-1]
-            previous = hist['Close'][-2]
-            change = ((current - previous) / previous) * 100
-            print(f"✅ Gold (국제금): ${current:.2f} ({change:+.2f}%)")
-            return {"value": round(current, 2), "change": round(change, 2)}
+        url = "https://www.investing.com/currencies/xau-usd"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        # BeautifulSoup으로 파싱
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 가격 찾기
+        price_elem = soup.select_one('[data-test="instrument-price-last"]')
+        if price_elem:
+            price_text = price_elem.text.strip().replace(',', '')
+            price = float(price_text)
+            
+            # 등락률 찾기
+            change_elem = soup.select_one('[data-test="instrument-price-change-percent"]')
+            change = 0.0
+            if change_elem:
+                change_text = change_elem.text.strip().replace('%', '').replace('+', '')
+                change = float(change_text)
+            
+            print(f"✅ Gold (Investing.com): ${price:,.2f} ({change:+.2f}%)")
+            return {"value": round(price, 2), "change": round(change, 2)}
+        
+        raise Exception("가격 요소를 찾을 수 없음")
+        
     except Exception as e:
         print(f"❌ Gold 에러: {e}")
-        # 백업: GC=F (선물) 시도
-        try:
-            ticker = yf.Ticker("GC=F")
-            hist = ticker.history(period="2d")
-            if len(hist) >= 2:
-                current = hist['Close'][-1]
-                previous = hist['Close'][-2]
-                change = ((current - previous) / previous) * 100
-                print(f"✅ Gold (선물 백업): ${current:.2f} ({change:+.2f}%)")
-                return {"value": round(current, 2), "change": round(change, 2)}
-        except:
-            pass
+    
     return None
-```
 
-**4. "Commit changes" 클릭**
-
-**5. Actions 재실행**
-```
-Actions 탭 → Run workflow
 
 def get_oil():
     """Oil (WTI)"""

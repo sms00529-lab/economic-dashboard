@@ -84,11 +84,18 @@ def get_gold():
                 current = hist['Close'][-1]
                 previous = hist['Close'][-2]
                 change = ((current - previous) / previous) * 100
-                print(f"✅ Gold (선물): ${current:.2f} ({change:+.2f}%)")
+                print(f"✅ Gold (선물 백업): ${current:.2f} ({change:+.2f}%)")
                 return {"value": round(current, 2), "change": round(change, 2)}
         except:
             pass
     return None
+```
+
+**4. "Commit changes" 클릭**
+
+**5. Actions 재실행**
+```
+Actions 탭 → Run workflow
 
 def get_oil():
     """Oil (WTI)"""
